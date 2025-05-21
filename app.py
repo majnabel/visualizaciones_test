@@ -96,4 +96,70 @@ with tab1:
     ## Gráfico de líneas para ventas mensuales
     fig, ax = plt.subplots(figsize=(12, 6))
     sns.lineplot(data=ventas_mensuales, x='Date_Monthly', y='Total', marker='o', ax=ax)
-    ax.
+    ax.set_title('Evolución Mensual de las Ventas Totales')
+    ax.set_xlabel('Mes y Año')
+    ax.set_ylabel('Ventas Totales')
+    ax.grid(True, linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    st.pyplot(fig)
+
+with tab2:
+    st.subheader("Análisis de Correlación Numérica (Heatmap)")
+    ## Seleccionar columnas numéricas
+    numeric_cols_to_analyze = ['Unit price', 'Quantity', 'Tax 5%', 'Total', 'cogs', 'gross income', 'Rating']
+    existing_numeric_cols = [col for col in numeric_cols_to_analyze if col in df_filtrado.columns]
+    numeric_df_for_corr = df_filtrado[existing_numeric_cols].copy()
+
+    ## Calcular matriz de correlación
+    correlation_matrix = numeric_df_for_corr.corr()
+
+    ## Gráfico heatmap de correlación
+    fig, ax = plt.subplots(figsize=(10, 8))
+    sns.heatmap(correlation_matrix, annot=True, cmap='coolwarm', fmt=".2f", linewidths=.5, ax=ax)
+    ax.set_title('Matriz de Correlación de Variables Numéricas')
+    plt.tight_layout()
+    st.pyplot(fig)
+
+with tab3:
+    st.subheader("Composición del Ingreso Bruto por Sucursal y Línea de Producto")
+    ## Cálculo de ingreso bruto por sucursal
+    ingreso_bruto_composicion = df_filtrado.groupby(['Branch', 'Product line'])['gross income'].sum().unstack(fill_value=0)
+
+    ## Gráfico de barras apiladas
+    fig, ax = plt.subplots(figsize=(12, 7))
+    ingreso_bruto_composicion.plot(kind='bar', stacked=True, colormap='viridis', ax=ax)
+    ax.set_title('Composición del Ingreso Bruto por Sucursal y Línea de Producto')
+    ax.set_xlabel('Sucursal (Branch)')
+    ax.set_ylabel('Ingreso Bruto')
+    ax.xticks(rotation=0)
+    ax.legend(title='Línea de Producto', bbox_to_anchor=(1.05, 1), loc='upper left')
+    plt.tight_layout()
+    st.pyplot(fig)
+
+with tab4:
+    st.subheader("Comparación del Gasto Total por Tipo de Cliente")
+    ## Gráfico boxplot
+    fig, ax = plt.subplots(figsize=(8, 6))
+    sns.boxplot(data=df_filtrado, x='Customer type', y='Total', palette='pastel', ax=ax)
+    ax.set_title('Distribución del Gasto Total por Tipo de Cliente')
+    ax.set_xlabel('Tipo de Cliente')
+    ax.set_ylabel('Gasto Total')
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+    plt.tight_layout()
+    st.pyplot(fig)
+
+with tab5:
+    st.subheader("Visualización 3D: Relación entre Ingreso Bruto, Cantidad y Calificación")
+    ## Gráfico 3D con Plotly
+    if not df_filtrado.empty and all(col in df_filtrado.columns for col in ['gross income', 'Quantity', 'Rating', 'Product line']):
+        fig_3d = px.scatter_3d(df_filtrado,
+                               x='gross income',
+                               y='Quantity',
+                               z='Rating',
+                               color='Product line',
+                               hover_name='Invoice ID',
+                               title='Relación 3D: Ingreso Bruto, Cantidad y Calificación por Línea de Producto')
+        fig_3d.update_layout(scene_camera=dict(up=dict(x=0, y=0, z=1), center=dict(x=0, y=0, z=-0.1), eye=dict(x=1.5, y=1.5, z=0.5)))
+        st.plotly_chart(fig_3d, use_container_width=True)
+    else:
+        st.warning("No hay datos suficientes o las columnas necesarias para la visualización 3D no están presentes en el DataFrame filtrado.")
