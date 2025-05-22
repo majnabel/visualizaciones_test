@@ -83,10 +83,10 @@ df_filtrado = df[
 # --- Pestañas para los Gráficos Solicitados ---
 tab1, tab2, tab3, tab4, tab5 = st.tabs([
     "Ventas Mensuales",
-    "Heatmap Correlación",
+    "Correlación Lineal (heatmap)",
     "Ingreso Bruto por Sucursal",
     "Gasto por Tipo de Cliente",
-    "Visualización 3D"
+    "Ingresos brutos con Cantidad y Calificación (visualización 3D)"
 ])
 
 with tab1:
